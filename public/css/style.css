@@ -1,0 +1,79 @@
+.logContent{
+	
+	text-align:left;
+}
+.logContent > pre {
+	height:400px;
+  white-space: pre-wrap;      /* CSS3 */
+  white-space: -moz-pre-wrap; /* Firefox */
+  white-space: -pre-wrap;     /* Opera <7 */
+  white-space: -o-pre-wrap;   /* Opera 7 */
+  word-wrap: break-word;      /* IE */
+}
+
+label{
+	font-weight: 400;
+letter-spacing: normal;
+text-transform: none;
+
+}
+.box-controls{
+   margin-left:20px
+}
+.box-controls > div{
+        margin: 0 4px;
+    padding: 10px;
+   
+    text-align: center;
+    display: inline-block;
+   
+}
+.avs-config .control-label{
+    display: inline-block;
+    width: 15%;
+    text-align: center;
+}
+.avs-config .clientid{
+display:inline-block;
+width:80%;
+}
+
+.custom-btn{
+ display:inline-block;
+}
+
+.form-control{
+ padding:6px 6px;
+}
+.content-header>h1 {
+    margin: 0;
+    font-size: 24px;
+}
+.content-header {
+    position: relative;
+    padding: 15px 15px 0 15px;
+}
+.content-header>h1>small {
+    font-size: 15px;
+    display: inline-block;
+    padding-left: 4px;
+    font-weight: 300;
+}
+
+@media (min-width: 768px){
+.avs-config .clientid{
+  width:75%;
+ }
+.avs-config .control-label{
+ width:18%;
+}
+.custom-btn{
+ /* width:19%; */
+}
+}
+
+@media (min-width: 992px){
+.custom-btn{
+ /* width:19%; */
+}
+}

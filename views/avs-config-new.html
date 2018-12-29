@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include headers/head.html %>
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+      <% include headers/body-top.html %>
+        <section class="content-header">
+          <% if(message) { for(var messageType in message) { message[messageType].forEach(function(messageContent) { %>
+            <div class="alert alert-<%=messageType%> alert-dismissible">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">&times;</button>
+              <%=messageContent%>
+            </div>
+            <% }); } } %>
+        <section class="content" style="min-height: 250px;padding: 10px;margin-right: auto;margin-left: auto;">
+          <div class="row avs-config" >
+           <div class="col-md-6">
+                    <h3>AVS Configuration</h3> 
+              <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">AVS Config</h3>
+                </div>
+                <form class="form-horizontal" action="/avs-config" method="POST">
+                  <div class="box-body">
+                    <div class="form-group">
+                      <label class="control-label">Client Id</label>
+                      <div class="clientid" >
+                        <input type="text" class="form-control" name="avsClientId" id="avsClientId" placeholder="Client Id" value="<%=avsClientId%>" required>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label">Client Secret</label>
+                      <div class="clientid" >
+                        <input type="text" class="form-control" name="avsClientSecret" id="avsClientSecret" placeholder="Client Secret" value="<%=avsClientSecret%>" required>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label" >Product Id</label>
+                      <div class="clientid" >
+                        <input type="text" class="form-control" name="avsProductId" id="avsProductId" placeholder="Product Id" value="<%=avsProductId%>" required>
+                      </div>
+                    </div>
+                  </div>
+                  <br>
+                  <div class="box box-primary">
+                    <div class="box-footer">
+                      <button id="submitForm" type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+           
+            </div>
+          </div>
+          <div class="row">
+               <div class="col-md-6">
+          	 <div class="">
+             		 <h3> Alexa Voice Service Login</h3>
+             
+             		<div class="box-login" style="background: #fff;padding: 30px 15px 40px;text-align: center;border-top: 3px solid #00c0ef;"> 
+            			 <p style="font-size:22px"> Click to sign in</p>
+               			 <form action="/avs-login" method="POST">
+               			   <div class="">
+                  			  <a id="login-button" href="#">
+                   			   <input type="image" border="0" src="images/btnLWA_gold_312x64.png" alt="Log in with amazon" />
+                    			  </a>
+                  		   </div>
+                                 </form>
+            		</div>
+           	 </div>
+              </div>    
+           </div><br><br>   
+           <div class="row">
+              <div id="app-avs" class="col-md-6 app-container" value="avs">
+					<div class="box box-info">
+						<div class="box-header with-border">
+							<h3 class="box-title">AVS-APP</h3>&nbsp;&nbsp;&nbsp;&nbsp; Status:&nbsp;
+							<span class="status"></span>
+						</div>
+						<div class="box-body">
+							<span class="toggle" id="startButton">
+								<a href="#" class="btn btn-app start-button"><i class="fa fa-play"></i>Start</a>
+								<a href="#" hidden class="btn btn-app stop-button"><i class="fa fa-stop"></i>Stop</a>
+                            </span>
+                          
+							<a href="#" class="clear btn btn-app"><i class="fa fa-trash"></i>Clear</a>
+							<div tabindex=0 class="logContent">
+								<pre>
+								</pre>
+							</div>
+						</div>
+					</div>
+				</div>
+              
+          </div>
+        </section>
+       
+	<% include headers/body-bottom.html %>
+
+	<script src="socket.io/socket.io.js"></script>
+	<script src="js/home.js"></script>
+  </body>
+  
+</html>

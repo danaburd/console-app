@@ -1,0 +1,42 @@
+
+</div>
+<footer class="main-footer">
+<div class="pull-right hidden-xs">IP:
+<span id="localIP">
+</span>- WiFi:
+<span id="wifiIP">
+</span>&nbsp;Voice Interaction on Hardware Version 2.0
+</div>
+<strong>Copyright &copy; 2017&nbsp;<a href="https://www.cirrus.com/">CIRRUS LOGIC</a>.&nbsp;</strong>All rights reserved.</footer>
+</div>
+<script src="js/jQuery-2.2.0.min.js"></script>
+<script>
+var page = "<%=page%>";
+$("#tab-" + page).addClass("active").closest(".treeview").addClass('active');
+
+$( document ).ready(function() {
+	showIpAddress();
+    setInterval(showIpAddress,
+        20000  
+    );
+});
+
+function showIpAddress(){
+    $.ajax({
+        url: "/getIP",
+        success: function (res) {
+            console.log("Success: " + res);
+            $("#localIP").text(res["localIP"]);
+            $("#wifiIP").text(res["wifiIP"]);
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            console.log("Error " + XMLHttpRequest.responseText);
+        }
+    });
+}
+
+</script>
+<script src="js/bootstrap.min.js"></script>
+
+<!-- AdminLTE App -->
+<script src="js/app.min.js"></script>

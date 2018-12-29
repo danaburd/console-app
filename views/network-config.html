@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">  -->
+
+	<% include headers/head.html %>
+	
+</head>
+
+<body class="hold-transition skin-blue sidebar-mini">
+
+	<div id="edit-network-modal" class="modal fade" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;
+				</span></button><h4 class="modal-title"></h4>
+				</div>
+				<div class="modal-body">
+					<form id="network-form" action="/network/save" class="form-horizontal" method="POST">
+						<div class="form-group">
+							<label for="ssid" class="col-sm-2 control-label">SSID</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="ssid" name="ssid" placeholder="SSID" readonly>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="password" class="col-sm-2 control-label">Password</label>
+							<div class="col-sm-10">
+								<input type="password" class="form-control" id="password" name="password" placeholder="Password" >
+							</div>
+						</div>
+						<div class="form-group" id="show-password-checkbox-group">
+							<div class="col-sm-offset-2 col-sm-10">
+								<div class="checkbox">
+								<label>
+									<input id="show-password-checkbox" type="checkbox">Show Password
+								</label>
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group" id="unsecured-msg-box" style="display:none;">
+							<div class="col-sm-offset-2 col-sm-10">
+								<div style="color: #ff4d4d;">
+								<label> 
+									Password is not required for unsecured wifi connections.
+								</label>
+								</div>
+							</div>
+						</div>
+						
+					</form>
+					
+				</div>
+			
+				<div class="modal-footer">
+					<!-- <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button> -->
+					<button id="save-button" type="button" class="btn btn-primary">Save</button>
+					<!-- <button id="save-connect-reboot-button" type="button" class="btn btn-success">Save and Connect</button> -->
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				</div>
+			</div>	
+		</div>
+	</div>
+	<!-- /.modal -->
+
+<div id="hotspot-modal" class="modal fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog" role="document" style="width: 200px;text-align: center;top: 40%;">
+			<div class="modal-content">
+				<div class="modal-header">
+				<h4 class="modal-title">Please wait...</h4>
+				</div>
+			</div>	
+		</div>
+	</div>
+	<!-- /.modal -->
+	
+	
+
+<div class="wrapper">
+<% include headers/body-top.html %>
+<section class="content-header">
+	<% if(message) { 
+        for(var messageType in message) {
+          message[messageType].forEach(function(messageContent) {
+        %>
+		<div class="alert alert-<%=messageType%> alert-dismissible">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">&times;</button>
+			<%=messageContent%>
+		</div>
+		<% });
+        }
+    } %>
+      
+      
+    <!--  <div class="checkbox">
+     
+     	<div>
+        <span>HotSpot</span>
+     	<span>
+     	<input type="checkbox" name="checkbox1" id="enableHotSpot" data-toggle="toggle" /> 
+     		
+     	</span> 
+     	</div>
+     
+     </div>  -->
+     
+  	<h1>WiFi Settings<small>Select and add WiFi access points.</small></h1></section>
+	<section class="content">
+		<div class="row">
+			<div class="col-md-6">
+				<div class="box box-info">
+					<div class="box-header with-border"><h3 class="box-title">Networks</h3>
+					</div>
+				<form class="form-horizontal">
+					<div class="box-body">
+						<div class="form-group">
+							<div class="col-sm-12">
+							<select class="form-control col-sm-12" id="network" name="network">
+							<% wifiSettings.forEach(function(network) { %>
+							<option value='<%=network.ssid%>'><%=network.ssid%></option><% }); %>
+							</select>
+							<div class="btn-group refresh-button" style="  float: right;padding-top: 10px;">
+							<button id="refresh-button" type="button" class="btn btn-default">Scan</button>
+							</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="box-footer">
+						
+						<!-- <div class="pull-right"> -->
+							<div class="btn-group">
+							<button id="new-network-button" type="button" class="btn btn-default">Add</button>
+							</div>&nbsp;&nbsp;&nbsp;
+							
+							<div class="btn-group">
+							<button id="edit-network-button" type="button" class="btn btn-default">Edit Network</button>
+							</div>&nbsp;&nbsp;&nbsp;
+							<div class="btn-group">
+							<button id="connect-reboot-button" type="button" class="btn btn-primary">Connect and Reboot</button>
+							</div>&nbsp;&nbsp;&nbsp;
+							<div class="btn-group">
+							<button id="forget-button" type="button" class="btn btn-danger" value="forgot">Forget</button>
+							</div>
+							
+							
+						<!-- </div> -->
+					</div>
+					
+				</form>
+				</div>
+			<p class="lead col-sm-12">
+				If a network connection is not found in 30 seconds after boot, 
+				the DUET board will create a hotspot with the following credentials.
+				<br>SSID: DUET
+				<br>PSK: duetboard1
+			</p>
+			</div>
+		</div>
+	</section>
+
+
+<form id="connect-to-network-form" action="/network/connect" method="POST">
+<input type="hidden" id="connect-ssid" name="ssid" />
+</form>
+
+<form id="forget-network-form" action="/network/forget" method="POST">
+<input type="hidden" id="forget-ssid" name="ssid" />
+</form>
+<% include headers/body-bottom.html %>
+<!-- <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script> -->
+<script>
+var networks = <%-JSON.stringify(wifiSettings)%>;
+  //var networks = <%-JSON.stringify(wifiSettings.savedNetworks)%>;
+  console.log("length : "+networks.length);
+//alert('page reloaded');
+var currentWifi="<%-currentWifi%>";
+ var checkWifi = function(value){
+
+	networks.forEach(function(item) { 
+		//console.log("this value "+value + "ssid " +item.ssid );
+		if( value== item.ssid){
+		
+			if(item.isSaved == true){
+
+				$("#edit-network-button").removeAttr('disabled');
+			  	$("#connect-reboot-button").removeAttr('disabled');
+			  	$("#forget-button").removeAttr('disabled');
+				$("#new-network-button").attr('disabled','disabled');
+
+			}else{
+				$("#edit-network-button").attr('disabled','disabled');
+			  	$("#connect-reboot-button").attr('disabled','disabled');
+			  	$("#forget-button").attr('disabled','disabled');
+			 	$("#new-network-button").removeAttr('disabled');								
+			}
+			
+			if(item.isSecure == 'off'){
+				$("#password").attr('readonly','readonly');
+				$("#show-password-checkbox").attr("disabled", "disabled");
+				$("#unsecured-msg-box").css('display', 'block');
+				$("#show-password-checkbox-group").css('display', 'none');
+				
+				
+			 }else{
+				$("#password").removeAttr('readonly');
+				$("#show-password-checkbox").removeAttr("disabled");
+				$("#unsecured-msg-box").css('display', 'none');
+				$("#show-password-checkbox-group").css('display', 'block');
+			  								
+			}
+			
+		}
+	});		
+
+
+}
+	
+  
+  var networks = <%-JSON.stringify(wifiSettings)%>;
+  //var networks = <%-JSON.stringify(wifiSettings.savedNetworks)%>;
+  console.log("length : "+networks.length);
+  
+  var htp = <%-JSON.stringify(hotspt)%>;
+  // 1- for hotstop, 2-wifi
+  
+  if(htp == 1){
+	 console.log("Status is ON");
+	 $("#connect-reboot-button").text("Connect and Reboot");
+	 //$("#save-connect-reboot-button").text("Connect and Reboot");
+	
+  }else if(htp ==2){
+	console.log("Status is OFF");
+	$("#connect-reboot-button").text("Connect");
+  } 
+    
+  var selectedSSID = function() {
+    return $("#network").val();
+  }
+  
+  var getNetwork = function(ssid) {
+    return networks.find(function(network) {
+      return network.ssid == ssid;
+    });
+  }
+  
+  var showModal = function() {
+    $("#edit-network-modal").modal();
+  }
+  
+  var newNetwork = function() {
+    var modal = $("#edit-network-modal");
+    modal.find(".modal-title").html("New Network");
+//	console.log("N/W"+$("#network option:selected").val());
+    $("#ssid").val($("#network option:selected").val());
+    $("#password").val("");
+    showModal();
+  }
+
+  var refreshScan = function() {
+	console.log("Entered Refresh Scan");
+	var scanList , count = 0 , wifi;
+	$("#hotspot-modal").modal();
+  	$.ajax({ url: "/refreshScan",
+             success: function(res){          
+		$('#network').children('option').remove();
+		networks = JSON.parse(res);
+	
+		networks.forEach(function(item) { 
+			
+			if(item.ssid ==currentWifi){
+				$('#network').append(new Option(item.ssid, item.ssid, true, true));
+			}else{
+				$('#network').append(new Option(item.ssid, item.ssid, false, false));
+			}
+			if(count == 0){
+				wifi = item.ssid ;
+				count++ ; 
+			}
+		});
+		//checkWifi(wifi);
+		console.log
+		if(count==0) {
+			$("#new-network-button").attr('disabled','disabled');
+			$("#edit-network-button").attr('disabled','disabled');
+		  	$("#connect-reboot-button").attr('disabled','disabled');
+		  	$("#forget-button").attr('disabled','disabled');
+		}else{
+			checkWifi(currentWifi);
+		}
+		
+		$("#hotspot-modal").modal("hide")			
+             },
+             error: function(XMLHttpRequest, textStatus, errorThrown) {
+                 console.log("Error " + XMLHttpRequest.responseText);
+             }
+         }); }
+  
+  var editNetwork = function(ssid) {
+    var network = getNetwork(ssid);
+    var modal = $("#edit-network-modal");
+    modal.find(".modal-title").html("Edit Network");
+    $("#ssid").val(network.ssid);
+    $("#password").val(network.psk);
+    showModal();
+  }
+  
+  var saveNetwork = function() {
+    $("#network-form").submit();
+    $("#hotspot-modal").modal();
+  }
+  
+  
+  var connectToNetwork = function(ssid) {
+    var form = $("#connect-to-network-form");
+    $("#connect-ssid").val(ssid);
+    form.submit();
+    $("#hotspot-modal").modal();
+   
+  }
+  
+  var saveAndConnect = function() {
+    var form = $("#network-form");
+    form.attr('action', '/network/save/connect');
+    form.submit();
+	$("#hotspot-modal").modal();
+  }
+ 
+  var forgetNetwork = function(ssid) {
+	console.log("ssid : "+ssid);
+	$("#hotspot-modal").modal();
+    var form = $("#forget-network-form");
+    $("#forget-ssid").val(ssid);
+    form.submit();
+    
+  }
+  
+  $("#refresh-button").click(refreshScan);
+
+
+  $("#new-network-button").click(newNetwork);
+  
+  $("#edit-network-button").click(function() {
+    var ssid = selectedSSID();
+    if(network) {
+      editNetwork(ssid);
+    }
+  });
+	
+  $("#network").change(function() {
+	var value = $("#network option:selected").val();
+	console.log("Change  " + value);
+	checkWifi(value);
+
+  });  
+
+  $("#show-password-checkbox").change(function() {
+    var type = $(this).is(":checked") ? "text" : "password";
+    $("#password").attr("type", type);
+  });
+  
+  $("#save-button").click(function() {
+    $(this).button("loading");
+    saveNetwork();
+  });
+  
+  $("#connect-reboot-button").click(function() {
+    $(this).button("loading");
+    var ssid = selectedSSID();
+    connectToNetwork(ssid);
+  });
+  
+  $("#forget-button").click(function() {
+    $(this).button("loading");
+    
+    //forgetNetwork($("#ssid").val());
+    forgetNetwork($("#network option:selected").val());
+  });
+  
+  /* $("#save-connect-reboot-button").click(function() {
+    $(this).button("loading");
+    saveAndConnect();
+  }); */
+  
+  if(networks.length==0){
+	  $("#new-network-button").attr('disabled','disabled');
+	  $("#edit-network-button").attr('disabled','disabled');
+  	  $("#connect-reboot-button").attr('disabled','disabled');
+  	  $("#forget-button").attr('disabled','disabled');
+  }
+
+  if($('#network option').eq(0).val() !=null || $('#network option').eq(0).val()!= ""){
+		
+	  
+	  if(currentWifi == "off/any")
+	  {
+		checkWifi($('#network option').eq(0).val());
+		checkWifi($('#network option').eq(0).val());
+	  }
+	  else
+	  {
+		  $("#network").val(currentWifi);
+		  checkWifi(currentWifi);
+	  }
+	  
+	 }	
+  console.log("selected index : "+$('#network option').eq(0).val());
+
+
+
+  
+  </script></body></html>

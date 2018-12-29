@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head><% include headers/head.html %>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+	<div class="wrapper">
+		<% include headers/body-top.html %>
+		<section class="content-header">
+		<% if(message) { 
+		   for(var messageType in message) {
+		     message[messageType].forEach(function(messageContent) {%>
+				<div class="alert alert-<%=messageType%> alert-dismissible">
+					<button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">&times;</button>
+					<%=messageContent%>
+				</div>
+			<% });
+		   }
+		 } %>
+		<h1>Home<small></small></h1></section>
+		<section class="content">
+			<div class="row">
+				<div id="app-avs" class="col-md-6 app-container" value="avs">
+					<div class="box box-info">
+						<div class="box-header with-border">
+							<h3 class="box-title">AVS</h3>&nbsp;&nbsp;&nbsp;&nbsp; Status:&nbsp;
+							<span class="status"></span>
+						</div>
+						<div class="box-body">
+							<span class="toggle">
+								<a href="#" class="btn btn-app start-button"><i class="fa fa-play"></i>Start</a>
+								<a href="#" hidden class="btn btn-app stop-button"><i class="fa fa-stop"></i>Stop</a>
+							</span>
+							<span class="log-toggle">
+								<a href="#" class="start-log btn btn-app"><i class="fa fa-toggle-off"></i>Logs</a>
+								<a href="#" hidden class="stop-log btn btn-app"><i class="fa fa-toggle-on"></i>Logs</a>
+							</span>
+							<a href="#" class="clear btn btn-app"><i class="fa fa-trash"></i>Clear</a>
+							<div tabindex=0 class="logContent">
+								<pre>
+								</pre>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	<% include headers/body-bottom.html %>
+
+	<script src="socket.io/socket.io.js"></script>
+	<script src="js/home.js"></script>
+	
+</body>
+</html>

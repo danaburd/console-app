@@ -1,0 +1,90 @@
+.audioMode{
+    display: table;
+}
+
+.circleBase {
+    display: table-cell;
+    /*border: 3px solid #000;*/
+}
+
+.circle {
+    border-radius: 50%;
+    /*behavior: url(PIE.htc);  remove if you don't care about IE8 */
+    width: 25px;
+    height: 25px;
+    background: rgba(189, 195, 199,1.0);
+    display:inline-block;
+}
+
+.circleActive {
+    background: rgba(46, 204, 113,1.0);
+}
+
+.circleText{
+    display:inline-block;
+    vertical-align:top;
+    /* padding-left: 5px; */
+    padding-right: 5px;
+}
+
+.tooltip.top .tooltip-inner {
+    background-color: #3C8DBC;
+    font-size: 14px;
+}
+.tooltip.top .tooltip-arrow {
+    border-top-color: #3C8DBC;
+}
+
+
+input[type=checkbox].css-checkbox {
+    position:absolute; z-index:-1000; left:-1000px; overflow: hidden; clip: rect(0 0 0 0); height:1px; width:1px; margin:-1px; padding:0; border:0;
+}
+
+input[type=checkbox].css-checkbox + label.css-label {
+    padding-left:23px;
+    height:18px;
+    display:inline-block;
+    line-height:18px;
+    background-repeat:no-repeat;
+    background-position: 0 0;
+    font-size:14px;
+    vertical-align:middle;
+    cursor:pointer;
+
+}
+
+input[type=checkbox].css-checkbox:checked + label.css-label {
+    background-position: 0 -18px;
+}
+label.css-label {
+    background-image:url("../images/css_checkbox.png");
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* disable the spinner that's taking up so much of the textbox */
+input[type='number'] {
+    -moz-appearance:textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+/* has error property, add a background color */
+.input-error{
+    background-color: #ffcccc !important;
+}
+
+.eq-error, .val-error{
+    background-color: #ffcccc;
+}
+
+eq-help-error, .eq-help-error{
+    color:red;
+}

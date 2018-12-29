@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+
+<head><% include headers/head.html %></head>
+
+<body class="hold-transition skin-blue sidebar-mini">
+
+<div id="file-upload-modal" class="modal fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog" role="document" style="width: 200px;text-align: center;top: 40%;">
+		<div class="modal-content">
+			<div class="modal-header">
+			<h4 class="modal-title">Please wait...</h4>
+			</div>
+		</div>	
+	</div>
+</div>
+	<!-- /.modal -->
+	
+
+<div class="wrapper">
+	<% include headers/body-top.html %>
+	<section class="content-header" style="padding: 5px 15px 0 15px;position:relative">
+	<% if(message) {
+        for(var messageType in message) {
+        	message[messageType].forEach(function(messageContent) {
+        	%>
+			<div class="alert alert-<%=messageType%> alert-dismissible">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">&times;</button>
+				<%=messageContent%>
+			</div>
+			<% });
+        }
+    } %>
+<div class="page-head">
+    <h1 style="display:inline-block;font-size: 24px;margin:0">DUET Configuration<small style="font-size: 15px;padding-left:4px">Modify DUET properties</small></h1>
+<!-- Open and Save configurations start  -->
+               <div class="box-controls" style="display: inline-block;">
+                                <div>
+				<input type="button" id="openConfigurationButton" type="submit" class="btn btn-primary" value="Open Configuration" />
+                                </div>
+                                 <div>
+				<input type="button" id="saveConfigurationButton" type="submit" style="padding-left:10px;" class="btn btn-primary" value="Save Configuration"/>
+                              </div>
+                <input id="fileInput" type="file" style="display:none;" />
+			</div>
+
+<!-- Open and Save configurations end  -->
+</div>
+    </section>
+    
+<section class="content" style="padding: 10px 20px 20px">
+
+<div class="row">
+	<div class="col-md-4">
+		<!-- SoundClear box start  -->
+		<div class="box box-default">
+			<div class="box-header with-border"><h3 class="box-title">SoundClear</h3>
+				<div class="box-tools pull-right">
+					<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+				</div>
+			</div>
+		
+			
+			<form class="form-horizontal" onsubmit="return false;">
+			
+				<div class="box-body">
+					<div class="form-group">
+						<div class="col-sm-offset-3 col-sm-9">
+							<div class="input-group">
+								<input type="checkbox" name="checkboxG4"
+									id="soundclearEnable" class="css-checkbox" <%=
+								(duetConfig['appprocmod'] == 1) ? 'checked' : '' %> /> 
+								<label for="soundclearEnable" class="css-label">SoundClear Enabled</label>
+							</div>
+						</div>
+					</div>
+				
+					<div class="form-group">
+						<label for="txgainPassThrough" class="col-sm-6 control-label">TX Bypass Gain</label>
+						<div class="col-sm-6">
+							<div class="input-group">
+								<input type="number" class="form-control"
+									id="txgainPassThrough" data-max="24.0824"
+									data-toggle="tooltip" title="-Infinity...24.0824 dB"
+									placeholder="-Infinity...24 dB" value='<%=
+								duetConfig['txgainPassThrough']%>' <%=
+								(duetConfig['appprocmod'] == 1) ? 'disabled' : '' %>> 
+								<span class="input-group-addon">dB</span>
+							</div>
+							<span class="help-block hidden" id="txgainPassThroughHelp">Please input a value up to 24.0824.</span>
+						</div>
+					</div>
+				</div>
+			
+			</form>
+		</div>
+		<!-- SoundClear box end  -->
+		
+		
+		<!-- Multi-Mic Parameters BOX START -->
+		<div class="box box-default collapsed-box">
+			<div class="box-header with-border"><h3 class="box-title">Multi-Mic Parameters</h3>
+				<div class="box-tools pull-right">
+					<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
+				</div>
+			</div>
+		
+			<form class="form-horizontal" onsubmit="return false;">
+			<div class="box-body">
+				<div class="form-group">
+					<label for="micSpacing" class="col-sm-6 control-label">Mic Spacing</label>
+					<div class="col-sm-6">
+						<div class="input-group">
+							<input type="number" class="form-control" id="micSpacing"
+								data-min="0" data-max="512" data-toggle="tooltip"
+								title="0...512 mm" placeholder="0...512 mm" value="<%=duetConfig['micSpacing']%>"
+							<%=(duetConfig['appprocmod'] == 1) ? '' : 'disabled' %> /> 
+							<span class="input-group-addon">mm</span>
+						</div>
+						<span class="help-block hidden" id="micSpacingHelp">Please input a value between 0 and 512.</span>
+					</div>
+				</div>
+			
+				<div style="padding:0px;">
+					<div class="radio" style="padding:0px;">
+						<div class="col-sm-6">
+							<label>
+								<input type="radio" name="micSource" id="micSourceInternal"
+												value="0" <%= (micSource == "0") ? 'checked' : '' %> />Internal
+												Microphones
+							</label>
+						</div>
+						
+						<div class="col-sm-6">
+							<label>
+								<input type="radio" name="micSource" id="micSourceExternal"
+												value="1" <%= (micSource == "1") ? 'checked' : '' %> />External
+												Microphones
+							</label>
+						</div>
+					</div>
+				</div>
+			</div>
+			</form>
+		</div>
+		<!-- Multi-Mic Parameters BOX END -->
+		
+		
+		<!-- RX Path Gains and EQ start -->
+		<div class="box box-default collapsed-box">
+			<div class="box-header with-border"><h3 class="box-title">RX Path Gains and EQ</h3>
+				<div class="box-tools pull-right">
+					<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
+				</div>
+			</div>
+			<form class="form-horizontal">
+				<div class="box-body">
+					<div class="form-group">
+						<label for="lineIn" class="col-sm-6 control-label">Line Input Gain</label>
+						<div class="col-sm-6">
+							<div class="input-group">
+								<input type="number" class="form-control" id="lineIn"
+									data-max="24.0824" data-toggle="tooltip"
+									title="-Infinity...24.0824" 
+									placeholder="-Infinity...24.0824" value="<%=duetConfig['lineIn']%>"
+								<%=(duetConfig['appprocmod'] == 1) ? '' : 'disabled' %>> 
+								<span class="input-group-addon">dB</span>
+							</div>
+							<span class="help-block hidden" id="lineInHelp">Please input a value up to 24.0824.</span>
+						</div>
+						
+					</div>
+		
+					<div class="form-group"  style="margin-bottom: 10px;">
+						<div class="col-md-12">
+							<table class="table table-condensed" id="eqTable"  style="margin-bottom: 0px;">
+								<tbody>
+									<tr>
+										<th >Low Shelf</th>
+										<th >Peaking</th>
+										<th >Peaking</th>
+										<th >Peaking</th>
+										<th >High Shelf</th>
+									</tr>
+									<tr></tr>
+									<tr>
+										<td colspan="5">EQ Filter Gains (dB)</td>
+									</tr>
+									<tr>
+										<td><input type="number" class="form-control"
+											id="filterGain1" data-min="-12" data-max="12"
+											data-toggle="tooltip" title="-12..12 dB" value='<%=eqRegisters["filterGain1"]%>'>
+										</td>
+										<td><input type="number" class="form-control"
+											id="filterGain2" data-min="-12" data-max="12"
+											data-toggle="tooltip" title="-12..12 dB" value='<%=eqRegisters["filterGain2"]%>'>
+										</td>
+										<td><input type="number" class="form-control"
+											id="filterGain3" data-min="-12" data-max="12"
+											data-toggle="tooltip" title="-12..12 dB" value='<%=eqRegisters["filterGain3"]%>'>
+										</td>
+										<td><input type="number" class="form-control"
+											id="filterGain4" data-min="-12" data-max="12"
+											data-toggle="tooltip" title="-12..12 dB" value='<%=eqRegisters["filterGain4"]%>'>
+										</td>
+										<td><input type="number" class="form-control"
+											id="filterGain5" data-min="-12" data-max="12"
+											data-toggle="tooltip" title="-12..12 dB" value='<%=eqRegisters["filterGain5"]%>'>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="5">Cutoff/Center Frequency (Hz)</td>
+									</tr>
+									<tr>
+										<td><input type="number" 
+											class="form-control eqControl" id="filterCutoff1"
+											data-min="50" data-max="20000" data-toggle="tooltip"
+											title="50..20000 Hz" value='<%=eqRegisters["filterCutoff1"]%>'>
+										</td>
+										<td><input type="number"
+											class="form-control eqControl" id="filterCutoff2"
+											data-min="120" data-max="24000" data-toggle="tooltip"
+											title="120..24000 Hz" value='<%=eqRegisters["filterCutoff2"]%>'>
+										</td>
+										<td><input type="number"
+											class="form-control eqControl" id="filterCutoff3" 
+											data-min="120" data-max="24000" data-toggle="tooltip"
+											title="120..24000 Hz" value='<%=eqRegisters["filterCutoff3"]%>'>
+										</td>
+										<td><input type="number"
+											class="form-control eqControl" id="filterCutoff4"
+											data-min="120" data-max="24000" data-toggle="tooltip"
+											title="120..24000 Hz" value='<%=eqRegisters["filterCutoff4"]%>'>
+										</td>
+										<td><input type="number"
+											class="form-control eqControl" id="filterCutoff5"
+											data-min="50" data-max="20000" data-toggle="tooltip"
+											title="50..20000 Hz" value='<%=eqRegisters["filterCutoff5"]%>'>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="5">Bandwidth (octaves)</td>
+									</tr>
+									<tr>
+										<td><input type="number" class="form-control"
+											id="filterBandwidthM1" data-min="0.100" data-max="3"
+											data-toggle="tooltip" title="0.100..3" value='<%=eqRegisters["filterBandwidthM1"]%>'
+											disabled></td>
+										<td><input type="number" class="form-control"
+											id="filterBandwidthM2" data-min="0.100" data-max="3"
+											data-toggle="tooltip" title="0.100..3" value='<%=eqRegisters["filterBandwidthM2"]%>'>
+										</td>
+										<td><input type="number" class="form-control"
+											id="filterBandwidthM3" data-min="0.100" data-max="3"
+											data-toggle="tooltip" title="0.100..3" value='<%=eqRegisters["filterBandwidthM3"]%>'>
+										</td>
+										<td><input type="number" class="form-control"
+											id="filterBandwidthM4" data-min="0.100" data-max="3"
+											data-toggle="tooltip" title="0.100..3" value='<%=eqRegisters["filterBandwidthM4"]%>'>
+										</td>
+										<td><input type="number" class="form-control"
+											id="filterBandwidthM5" data-min="0.100" data-max="3"
+											data-toggle="tooltip" title="0.100..3" value="0" disabled>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<span class="help-block hidden" id="eqHelp">Please check the EQ values.</span>
+						</div>
+					</div>
+					<div id="error-msg2" class="eq-help-error hidden" style="margin-bottom: 5px;">Peaking 1 : Multiplication of cutoff value and bandwidth should not exceed or equal to 24000</div>
+					<div id="error-msg3" class="eq-help-error hidden" style="margin-bottom: 5px;">Peaking 2 : Multiplication of cutoff value and bandwidth should not exceed or equal to 24000</div>
+					<div id="error-msg4" class="eq-help-error hidden" style="margin-bottom: 5px;">Peaking 3 : Multiplication of cutoff value and bandwidth should not exceed or equal to 24000</div>
+					<div class="form-group"  style="margin-top: 20px;">
+						<label for="speakerOut" class="col-sm-6 control-label">Speaker Out Gain	</label>
+						<div class="col-sm-6">
+							<div class="input-group">
+								<input type="number" class="form-control" data-min="-32"
+									data-max="16" id="speakerOut" data-toggle="tooltip"
+									title="-32...16" placeholder="-32...16" value='<%=duetConfig['speakerOut']%>'
+								<%= (duetConfig['appprocmod'] == 1) ? '' : 'disabled' %>> 
+								<span class="input-group-addon">dB</span>
+							</div>
+							<span class="help-block hidden" id="speakerOutHelp">Please input a value from -32 to 16.</span>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+		
+		<!-- RX Path Gains and EQ end -->
+		
+		
+		<!-- TX Path Gains Start  -->
+		<div class="box box-default collapsed-box">
+			<div class="box-header with-border"><h3 class="box-title">TX Path Gains</h3>
+				<div class="box-tools pull-right">
+					<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
+				</div>
+			</div>
+			
+			<form class="form-horizontal">
+				<div class="box-body">
+					<div class="form-group">
+						<label for="micInput" class="col-sm-6 control-label">Mic Input Gain</label>
+						<div class="col-sm-6">
+							<div class="input-group">
+								<input type="number" class="form-control" id="micInput"
+									data-max="24.0824" data-toggle="tooltip"
+									title="-Infinity...24.0824"
+									placeholder="-Infinity...24.0824" value='<%=duetConfig['micInput']%>'
+								<%= (duetConfig['appprocmod'] == 1) ? '' : 'disabled' %>> 
+								<span class="input-group-addon">dB</span>
+							</div>
+							
+							<span class="help-block hidden" id="micInputHelp">Please input a value up to 24.0824.</span>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label for="txMin" class="col-sm-6 control-label">TX Min threshold</label>
+						<div class="col-sm-6">
+							<div class="input-group">
+								<input type="number" class="form-control" id="txMin"
+									data-max="6.0206" data-toggle="tooltip"
+									title="-Infinity...6.0206" placeholder="-Infinity...6.0206"
+									value='<%=duetConfig['txMin']%>' <%= (duetConfig['appprocmod']
+								== 1) ? '' : 'disabled' %>> 
+								<span class="input-group-addon">dB</span>
+							</div>
+							<span class="help-block hidden" id="txMinHelp">Please input a value up to 6.0206.</span>
+						</div>
+					</div>
+			
+					<div class="form-group">
+						<label for="lineOut" class="col-sm-6 control-label">Line Out Gain</label>
+						<div class="col-sm-6">
+							<div class="input-group">
+								<input type="number" class="form-control" data-max="24.0824"
+									id="lineOut" data-toggle="tooltip"
+									title="-Infinity...24.0824"
+									placeholder="-Infinity...24.0824" value='<%=duetConfig['lineOut']%>'
+								<%= (duetConfig['appprocmod'] == 1) ? '' : 'disabled' %>> 
+								<span class="input-group-addon">dB</span>
+							</div>
+							<span class="help-block hidden" id="lineOutHelp">Please input a value up to 24.0824.</span>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+		<!-- TX Path Gains end  -->
+		
+		
+		<!-- AEC Parameters Starts  -->
+		<div class="box box-default collapsed-box">
+		
+			<div class="box-header with-border"><h3 class="box-title">AEC Parameters</h3>
+				<div class="box-tools pull-right">
+					<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
+				</div>
+			</div>
+		
+			<form class="form-horizontal">
+				<div class="box-body">
+					<div class="form-group">
+						<label for="aecReference" class="col-sm-6 control-label">AEC Reference Delay</label>
+						<div class="col-sm-6">
+							<div class="input-group">
+								<input type="number" class="form-control" id="aecReference"
+									data-min="4" data-max="10" data-toggle="tooltip"
+									title="4...10 mSec" placeholder="4...10 mSec" value='<%=duetConfig['aecReference']%>'
+								<%= (duetConfig['appprocmod'] == 1) ? '' : 'disabled' %>> 
+								<span class="input-group-addon">mSec</span>
+							</div>
+						
+							<span class="help-block hidden" id="aecReferenceHelp">Please input a value between 4 and 10.</span>
+						</div>
+					</div>
+								
+					<div class="form-group">
+						<label for="dtdThreshold" class="col-sm-6 control-label">DTD Threshold</label>
+						<div class="col-sm-6">
+							<div class="input-group">
+								<input type="number" class="form-control" id="dtdThreshold"
+									data-min="0" data-max="1" data-toggle="tooltip"
+									title="0...1" placeholder="0...1" value='<%=duetConfig['dtdThreshold']%>'
+								<%= (duetConfig['appprocmod'] == 1) ? '' : 'disabled' %>>
+							</div>
+							<span class="help-block hidden" id="dtdThresholdHelp">Please input a value between 0 and 1.</span>
+						</div>
+					</div>
+		
+					<div class="form-group">
+						<label for="micBulkDelay" class="col-sm-6 control-label">Mic Bulk Delay</label>
+						<div class="col-sm-6">
+							<div class="input-group">
+								<input type="number" class="form-control" id="micBulkDelay"
+									data-min="0" data-max="12" data-toggle="tooltip"
+									title="0...12 mSec" placeholder="0...12 mSec" value='<%=duetConfig['micBulkDelay']%>'
+								<%= (duetConfig['appprocmod'] == 1) ? '' : 'disabled' %>> 
+								<span class="input-group-addon">mSec </span>
+							</div>
+		
+							<span class="help-block hidden" id="micBulkDelayHelp">Please input a value between 0 and 12. </span>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+		<!-- AEC Parameters end  -->
+	</div>
+	<!-- inclucd graphs.html -->
+	 <%  include graphs.html %>
+</div>
+
+
+
+
+</section>
+
+<% include headers/body-bottom.html %>
+<script src="js/Chart.bundle.js"></script>
+<script>
+var current_tab=1;
+         $('#soundclearEnable').click(function () {
+			var isSoundClearEnabled = $('#soundclearEnable').is(':checked');
+			var soundVal=isSoundClearEnabled?1:2;
+			 $.ajax({ url: "/setRegister?register=appprocmod&val="+soundVal,
+                 success: function(res){
+                     console.log("Success: " + res);
+                 },
+                 error: function(XMLHttpRequest, textStatus, errorThrown) {
+                     console.log("Error " + XMLHttpRequest.responseText);
+                 }
+             });
+			 $('.nav-tabs a[href="#tab_1"]').tab('show');
+        });
+     
+        $('input[type=radio][name=micSource]').change(function() {
+            $.ajax({ url: "/setMicSource?val=" + this.value,
+                success: function(res){
+                    console.log("Success: " + res);
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("Error " + XMLHttpRequest.responseText);
+                }
+            });
+        });
+
+        $(".clipButton").click(function () {
+            var iid = $(this).attr('id');
+            $("#" + iid + "Text").val("");
+            $("#" + iid + "Text").removeClass("input-error");
+        });
+
+       function setEQ(){
+            var bandPassEnable = "0000";
+            if ($('#bandPassEnable').is(':checked') == true) {
+                bandPassEnable = "0001";
+            }else{
+                bandPassEnable = "0000";
+            }
+			
+            var parameter = "filterGain1=" + $("#filterGain1").val() +
+                "&filterGain2=" + $("#filterGain2").val() +
+                "&filterGain3=" + $("#filterGain3").val() +
+                "&filterGain4=" + $("#filterGain4").val() +
+                "&filterGain5=" + $("#filterGain5").val() +
+                "&filterCutoff1=" + $("#filterCutoff1").val() +
+                "&filterCutoff2=" + $("#filterCutoff2").val() +
+                "&filterCutoff3=" + $("#filterCutoff3").val() +
+                "&filterCutoff4=" + $("#filterCutoff4").val() +
+                "&filterCutoff5=" + $("#filterCutoff5").val() +
+                "&filterBandwidthM1=" + $("#filterBandwidthM1").val() +
+                "&filterBandwidthM2=" + $("#filterBandwidthM2").val() +
+                "&filterBandwidthM3=" + $("#filterBandwidthM3").val() +
+                "&filterBandwidthM4=" + $("#filterBandwidthM4").val() +
+                "&filterBandwidthM5=0" +
+                "&bandpass=" + bandPassEnable;
+            $.ajax({
+                url: "/setEQ?" + parameter,
+                success: function (res) {
+                    console.log("Success: " + res);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("Error " + XMLHttpRequest.responseText);
+                }
+            });
+        }
+
+
+        $('input[type=number]').bind('keyup', function(e) {
+			e.preventDefault();
+			// validateMaxValue(this);
+			
+            //on each keyup event, validate the input
+            if (e.which == 13 || e.keyCode == 13) {
+			//console.log('Enter key pressed');
+                if(validateMaxValue(this) && validate(this)){
+                    if($(this).attr('id').includes("filter")){
+                    	if($(this).attr('id').includes("filterCutoff")){
+                        	var temp=$(this).val();
+                        	$(this).val(parseFloat(temp).toFixed(0));
+                        }else if($(this).attr('id').includes("filterBandwidthM")){ 
+                        	var temp=$(this).val();
+                        	$(this).val(parseFloat(temp).toFixed(1));
+                        }else if($(this).attr('id').includes("filterGain")){ 
+                        	var temp=$(this).val();
+                        	$(this).val(parseFloat(temp).toFixed(0));
+                        }
+                        //set the EQ register
+                        setEQ();
+                        if (typeof duetSocketEQ != 'undefined' && current_tab==5) {
+                         	duetSocketEQ.disconnect();
+                         	enableEQSocket();
+                        }
+                    }else {
+                        //set the register
+                        setRegister(this);
+                    }
+                }
+                return;
+            }
+            validate(this);
+        });
+		
+        /* $('input[type=number]').change(function(){
+           if(validate(this)){
+                if($(this).attr('id').includes("filterCutoff")){
+                	var temp=$(this).val();
+                	$(this).val(parseFloat(temp).toFixed(0));
+                }else if($(this).attr('id').includes("filterBandwidthM")){ 
+                	var temp=$(this).val();
+                	$(this).val(parseFloat(temp).toFixed(1));
+                }else if($(this).attr('id').includes("filterGain")){ 
+                	var temp=$(this).val();
+                	$(this).val(parseFloat(temp).toFixed(0));
+                }
+            }
+        }); */
+        
+        $('input[type=number]').focusout(function(){
+            //remove all the tooltips
+			$('.tooltip').remove();
+			
+            if(validateMaxValue(this) && validate(this)){
+                if($(this).attr('id').includes("filter")){
+                	    if($(this).attr('id').includes("filterCutoff")){
+                        	var temp=$(this).val();
+                        	$(this).val(parseFloat(temp).toFixed(0));
+                        }else if($(this).attr('id').includes("filterBandwidthM")){ 
+                        	var temp=$(this).val();
+                        	$(this).val(parseFloat(temp).toFixed(1));
+                        }else if($(this).attr('id').includes("filterGain")){ 
+                        	var temp=$(this).val();
+                        	$(this).val(parseFloat(temp).toFixed(0));
+                        }
+                    
+                    //set the EQ register
+                    setEQ();
+                   
+                    if (typeof duetSocketEQ != 'undefined' && current_tab==5) {
+                     	duetSocketEQ.disconnect();
+                     	enableEQSocket();
+                    }
+                     	
+                }else {
+                    //set the register
+                    setRegister(this);
+                }
+            }
+        });
+
+        function validate(element){
+            if($(element).attr('id').includes("filter")){
+                return validateEQ(element);
+            }else{
+                return validateInput(element);
+            }
+		}
+		
+		/* Checks if filter cutoff * bandwidth exceeds 24000 or not
+		*  if exceeds displays error
+		*/
+		function validateMaxValue(element) {
+			if($(element).attr('id').includes("filterCutoff") || $(element).attr('id').includes("filterBandwidth") ){
+				console.log("this is the filters");
+				var idNum = $(element).attr('id').match(/\d+/)[0];
+				if (idNum == '2' || idNum == '3' || idNum == '4') {
+
+					var valueOfExpect = $("#filterBandwidthM"+idNum).val() * $("#filterCutoff"+idNum).val();
+					
+					if ($(element).attr('id').includes("Cutoff")) {
+						validateInputValueAgain(document.getElementById('filterBandwidthM'+idNum));
+					}
+					else {
+						validateInputValueAgain(document.getElementById('filterCutoff'+idNum));
+					}
+
+					if(valueOfExpect >= 24000){
+						$(element).addClass("eq-error");
+						$('#error-msg'+idNum).removeClass('hidden');
+						return false;
+					}else {
+						$(element).removeClass("eq-error");
+						$("#error-msg"+idNum).addClass("hidden");						
+						return true;
+					}
+				}
+			}
+			return true;
+		}
+
+		/* Takes an element as parameter
+		* checks whether its value satisfies it minimum(data-min) and maxmimum(data-max) values
+		*/
+		function validateInputValueAgain(element) {
+			var value =  parseFloat($(element).val());
+			var valueMax =  parseFloat($(element).attr("data-max"));
+			var valueMin =  parseFloat($(element).attr("data-min"));
+			if(value > valueMax || value < valueMin){
+				$(element).addClass("eq-error");
+			}else{
+				$(element).removeClass("eq-error");
+
+			}
+		}
+
+        function validateEQ(element){
+            var value =  parseFloat($(element).val());
+            var valueMax =  parseFloat($(element).attr("data-max"));
+            var valueMin =  parseFloat($(element).attr("data-min"));
+
+            if(value > valueMax || value < valueMin){
+                var index = $(element).attr('id')[$(element).attr('id').length-1];
+                if($(element).attr('id').includes("Gain")){
+                    $("#eqHelp").text("Please check gain of filter " +  index);
+                }else if ($(element).attr('id').includes("Cutoff")){
+                    $("#eqHelp").text("Please check cutoff frequency of filter " + index );
+                }else if($(element).attr('id').includes("Bandwidth")){
+                    $("#eqHelp").text("Please check bandwidth of filter " + index );
+                }
+                $(element).addClass("eq-error");
+                return false;
+            }
+            $(element).removeClass("eq-error");
+            $("#eqHelp").addClass("hidden");
+            return true;
+        }
+
+        function validateInput(element){
+			console.log(element);
+			
+            var iid = "#"+ $(element).attr('id');
+            //remove the error
+            $(iid).parent().parent().parent().removeClass("has-error");
+            $(iid).removeClass("input-error");
+            $(iid + "Help").addClass("hidden");
+            var val = $(iid).val();
+            var dataMin =  parseFloat($(iid).attr("data-min"));
+            var dataMax =  parseFloat($(iid).attr("data-max"));
+            var acceptValue = false;
+
+            if (typeof dataMin !== typeof undefined && dataMin !== false && !isNaN(dataMin)) {
+                // Element has a datamin
+                if(parseFloat(val) >= dataMin && parseFloat(val) <= dataMax){
+                    acceptValue = true;
+                }
+            }else{
+                if(parseFloat(val) <= dataMax){
+                    acceptValue = true;
+                }
+            }
+
+            if(!acceptValue){
+                $(iid).parent().parent().parent().addClass("has-error");
+                $(iid).addClass("input-error");
+                $(iid + "Help").removeClass("hidden");
+            }
+
+            return acceptValue;
+        }
+
+        function setRegister(element){
+            //also update the value on the page, in case of a reset
+            $.ajax({ url: "/setRegister?register=" +  $(element).attr('id') + "&val=" + $(element).val(),
+                success: function(res){
+                    console.log("Success: " + res);
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("Error " + XMLHttpRequest.responseText);
+                }
+            });
+        }
+
+     $('input[type=number]').prop("step","any");
+</script>
+<script src="socket.io/socket.io.js"></script>
+<script src="js/duet-graphs.js"></script>
+<script src="js/duet-ui-control.js"></script>
+</body>
+</html>

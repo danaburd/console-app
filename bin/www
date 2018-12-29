@@ -1,0 +1,115 @@
+#!/usr/bin/env node
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
+
+function tcpConnection(e){
+	e.once("data",function(r){
+		var t=22===r[0]?httpsAddress:redirectAddress,
+			s=net.createConnection(t,function(){
+				s.write(r),e.pipe(s).pipe(e)
+			})
+		})
+}
+
+/**
+ * Forward http to https.
+ * Forcing to secure protocol
+ */
+function httpConnection(e,r){
+	var t=e.headers.host;
+	r.writeHead(301,{Location:"https://"+t+e.url}),r.end()
+}
+
+/**
+ * Handle https requests
+ */
+function httpsConnection(e,r){
+	r.end()
+}
+
+/**
+ * Module dependencies.
+ */
+
+var app=require("../app"),
+	http=require("http"),
+	https=require("https"),
+	fs=require("fs"),
+	net=require("net"),
+	baseAddress=3000,
+	redirectAddress=3001,
+	httpsAddress=3002,
+	options={key:fs.readFileSync("node.key").toString(),
+			cert:fs.readFileSync("node.crt").toString(),
+			ca:fs.readFileSync("ca.crt").toString(),
+			requestCert:!0,rejectUnauthorized:!1}
+	;
+
+net.createServer(tcpConnection).listen(baseAddress)
+http.createServer(httpConnection).listen(redirectAddress, function () {
+	console.log('Console application started')
+});
+
+var server=https.createServer(options,app);
+server.listen(httpsAddress);
+app.initSocketIO(server);
+
+
